@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:foodpanda_sellers_app/authentication/auth_screen.dart';
 import 'package:foodpanda_sellers_app/global/global.dart';

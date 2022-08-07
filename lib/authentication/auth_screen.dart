@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodpanda_sellers_app/authentication/login.dart';
-import 'package:foodpanda_sellers_app/authentication/register1.dart';
+import 'package:foodpanda_sellers_app/authentication/register.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
