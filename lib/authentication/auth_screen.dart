@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:foodpanda_sellers_app/authentication/login.dart';
 import 'package:foodpanda_sellers_app/authentication/register.dart';
 
+
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  _AuthScreenState createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
@@ -18,53 +19,53 @@ class _AuthScreenState extends State<AuthScreen> {
         appBar: AppBar(
           flexibleSpace: Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.cyan,
-                  Colors.amber,
-                ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops:  [0.0, 1.0],
-                tileMode: TileMode.clamp,
-              )
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.cyan,
+                    Colors.amber,
+                  ],
+                  begin:  FractionalOffset(0.0, 0.0),
+                  end:  FractionalOffset(1.0, 0.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp,
+                )
             ),
           ),
+          automaticallyImplyLeading: false,
           title: const Text(
             "iFood",
             style: TextStyle(
-            fontSize: 60,
-            color: Colors.white,
-            fontFamily: "Lobster",
+              fontSize: 60,
+              color: Colors.white,
+              fontFamily: "Lobster",
+            ),
           ),
-        ),
-        centerTitle: true,
+          centerTitle: true,
           bottom: const TabBar(
             tabs: [
               Tab(
-                  icon: Icon(Icons.lock, color: Colors.white,),
-                  text: "Login",
+                icon: Icon(Icons.lock, color: Colors.white,),
+                text: "Login",
               ),
               Tab(
                 icon: Icon(Icons.person, color: Colors.white,),
                 text: "Register",
-              )
-
+              ),
             ],
             indicatorColor: Colors.white38,
-            indicatorWeight: 5,
+            indicatorWeight: 6,
           ),
-      ),
+        ),
         body: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                Colors.amber,
-                Colors.cyan,
-              ]
-            )
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  Colors.amber,
+                  Colors.cyan,
+                ],
+              )
           ),
           child: const TabBarView(
             children: [

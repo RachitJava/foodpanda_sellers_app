@@ -6,8 +6,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
+
+
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
@@ -21,9 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Colors.cyan,
                   Colors.amber,
                 ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops:  [0.0, 1.0],
+                begin:  FractionalOffset(0.0, 0.0),
+                end:  FractionalOffset(1.0, 0.0),
+                stops: [0.0, 1.0],
                 tileMode: TileMode.clamp,
               )
           ),
@@ -34,14 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body:  Center(
+      body: Center(
         child: ElevatedButton(
           child: const Text("Logout"),
           style: ElevatedButton.styleFrom(
-            primary: Colors.cyan
+            primary: Colors.cyan,
           ),
-          onPressed: (){
-            firebaseAuth.signOut().then((value) {
+          onPressed: ()
+          {
+            firebaseAuth.signOut().then((value){
               Navigator.push(context, MaterialPageRoute(builder: (c)=> const AuthScreen()));
             });
           },
