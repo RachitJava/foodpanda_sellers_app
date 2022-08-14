@@ -19,10 +19,10 @@ class ErrorDialog extends StatelessWidget
             primary: Colors.red,
           ),
           onPressed: ()
-            {
-              Navigator.pop(context);
-            }
-        )
+          {
+            Navigator.pop(context);
+          },
+        ),
       ],
     );
   }

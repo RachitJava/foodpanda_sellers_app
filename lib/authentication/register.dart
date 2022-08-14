@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:foodpanda_sellers_app/global/global.dart';
 import 'package:foodpanda_sellers_app/mainScreens/home_screen.dart';
 import 'package:foodpanda_sellers_app/widgets/custom_text_field.dart';
 import 'package:foodpanda_sellers_app/widgets/error_dialog.dart';
@@ -14,13 +14,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as fStorage;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../global/global.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen>
@@ -38,8 +37,10 @@ class _RegisterScreenState extends State<RegisterScreen>
 
   Position? position;
   List<Placemark>? placeMarks;
-  String sellerImageUrl="";
-  String completeAddress="";
+
+  String sellerImageUrl = "";
+  String completeAddress = "";
+
 
   Future<void> _getImage() async
   {
@@ -54,86 +55,62 @@ class _RegisterScreenState extends State<RegisterScreen>
     Position newPosition = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
+
     position = newPosition;
+
     placeMarks = await placemarkFromCoordinates(
       position!.latitude,
       position!.longitude,
     );
+
     Placemark pMark = placeMarks![0];
+
     completeAddress = '${pMark.subThoroughfare} ${pMark.thoroughfare}, ${pMark.subLocality} ${pMark.locality}, ${pMark.subAdministrativeArea}, ${pMark.administrativeArea} ${pMark.postalCode}, ${pMark.country}';
+
     locationController.text = completeAddress;
-
   }
-
-//   Future<Position?> determinePosition() async {
-//     LocationPermission permission;
-//     permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.deniedForever) {
-//         return Future.error('Location Not Available');
-//       }
-//     } else {
-//       throw Exception('Error');
-//     }
-//     return await Geolocator.getCurrentPosition();
-//   }
-// }
 
   Future<void> formValidation() async
   {
     if(imageXFile == null)
+    {
+      showDialog(
+        context: context,
+        builder: (c)
+        {
+          return ErrorDialog(
+            message: "Please select an image.",
+          );
+        }
+      );
+    }
+    else
+    {
+      if(passwordController.text == confirmPasswordController.text)
       {
-        showDialog(
+        if(confirmPasswordController.text.isNotEmpty && emailController.text.isNotEmpty && nameController.text.isNotEmpty && phoneController.text.isNotEmpty && locationController.text.isNotEmpty)
+        {
+          //start uploading image
+          showDialog(
             context: context,
             builder: (c)
             {
-              return ErrorDialog(
-                message: "Please select an image.",
+              return LoadingDialog(
+                message: "Registering Account",
               );
-
             }
-        );
-      }
-    else
-      {
-        if(passwordController.text == confirmPasswordController.text)
-        {
-          if(confirmPasswordController.text.isNotEmpty && emailController.text.isNotEmpty
-              && nameController.text.isNotEmpty && phoneController.text.isNotEmpty && locationController.text.isNotEmpty)
-            {
-             //start uploading the image
-              showDialog(
-                  context: context,
-                  builder: (c)
-                  {
-                    return LoadingDialog(
-                      message: "Registering Account",
-                    );
-                  }
-              );
-              String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-              fStorage.Reference reference = fStorage.FirebaseStorage.instance.ref().child("sellers").child(fileName);
-              fStorage.UploadTask uploadTask = reference.putFile(File(imageXFile!.path));
-              fStorage.TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
-              await taskSnapshot.ref.getDownloadURL().then((url) {
-                sellerImageUrl = url;
+          );
 
-                //save info to firestore
-                authenticateSellerAndSignUp();
-              });
-            }
-          else
-          {
-            showDialog(
-                context: context,
-                builder: (c)
-                {
-                  return ErrorDialog(
-                    message: "Please write the complete required info for the registration.",
-                  );
-                });
-          }
+          String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+          fStorage.Reference reference = fStorage.FirebaseStorage.instance.ref().child("sellers").child(fileName);
+          fStorage.UploadTask uploadTask = reference.putFile(File(imageXFile!.path));
+          fStorage.TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+          await taskSnapshot.ref.getDownloadURL().then((url) {
+            sellerImageUrl = url;
+
+            //save info to firestore
+            authenticateSellerAndSignUp();
+          });
         }
         else
         {
@@ -142,9 +119,23 @@ class _RegisterScreenState extends State<RegisterScreen>
               builder: (c)
               {
                 return ErrorDialog(
-                  message: "Password do not match.",
+                  message: "Please write the complete required info for Registration.",
+                );
+              }
+          );
+        }
+      }
+      else
+      {
+        showDialog(
+            context: context,
+            builder: (c)
+            {
+              return ErrorDialog(
+                message: "Password do not match.",
               );
-            });
+            }
+        );
       }
     }
   }
@@ -152,12 +143,13 @@ class _RegisterScreenState extends State<RegisterScreen>
   void authenticateSellerAndSignUp() async
   {
     User? currentUser;
+
     await firebaseAuth.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-    ).then((auth) => {
-      currentUser = auth.user
-    }).catchError((error) {
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    ).then((auth) {
+      currentUser = auth.user;
+    }).catchError((error){
       Navigator.pop(context);
       showDialog(
           context: context,
@@ -166,21 +158,23 @@ class _RegisterScreenState extends State<RegisterScreen>
             return ErrorDialog(
               message: error.message.toString(),
             );
-          });
+          }
+      );
     });
-    if(currentUser != null)
-      {
-        saveDataToFireStore(currentUser!).then((value) {
-          Navigator.pop(context);
-          //send user to homePage
-          Route newRoute = MaterialPageRoute(builder: (c) => HomeScreen());
-          Navigator.pushReplacement(context, newRoute);
-        });
-      }
-  }
-  Future saveDataToFireStore(User currentUser) async
-  {
 
+    if(currentUser != null)
+    {
+      saveDataToFirestore(currentUser!).then((value) {
+        Navigator.pop(context);
+        //send user to homePage
+        Route newRoute = MaterialPageRoute(builder: (c) => HomeScreen());
+        Navigator.pushReplacement(context, newRoute);
+      });
+    }
+  }
+
+  Future saveDataToFirestore(User currentUser) async
+  {
     FirebaseFirestore.instance.collection("sellers").doc(currentUser.uid).set({
       "sellerUID": currentUser.uid,
       "sellerEmail": currentUser.email,
@@ -191,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       "status": "approved",
       "earnings": 0.0,
       "lat": position!.latitude,
-      "lon": position!.longitude,
+      "lng": position!.longitude,
     });
 
     //save data locally
@@ -201,6 +195,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     await sharedPreferences!.setString("name", nameController.text.trim());
     await sharedPreferences!.setString("photoUrl", sellerImageUrl);
   }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -208,6 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
+            const SizedBox(height: 10,),
             InkWell(
               onTap: ()
               {
@@ -216,14 +212,14 @@ class _RegisterScreenState extends State<RegisterScreen>
               child: CircleAvatar(
                 radius: MediaQuery.of(context).size.width * 0.20,
                 backgroundColor: Colors.white,
-                backgroundImage: imageXFile==null? null : FileImage(File(imageXFile!.path)),
+                backgroundImage: imageXFile==null ? null : FileImage(File(imageXFile!.path)),
                 child: imageXFile == null
-                  ?
-              Icon(
-                Icons.add_photo_alternate,
-                size: MediaQuery.of(context).size.width * 0.20,
-                color: Colors.grey,
-              ) : null
+                    ?
+                Icon(
+                  Icons.add_photo_alternate,
+                  size: MediaQuery.of(context).size.width * 0.20,
+                  color: Colors.grey,
+                ) : null,
               ),
             ),
             const SizedBox(height: 10,),
@@ -266,17 +262,17 @@ class _RegisterScreenState extends State<RegisterScreen>
                     controller: locationController,
                     hintText: "Cafe/Restaurant Address",
                     isObsecre: false,
-                    enabled: false,
+                    enabled: true,
                   ),
                   Container(
                     width: 400,
                     height: 40,
                     alignment: Alignment.center,
                     child: ElevatedButton.icon(
-                        label: Text(
-                          "Get my Current Location",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                      label: const Text(
+                        "Get my Current Location",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       icon: const Icon(
                         Icons.location_on,
                         color: Colors.white,
@@ -286,34 +282,32 @@ class _RegisterScreenState extends State<RegisterScreen>
                         getCurrentLocation();
                       },
                       style: ElevatedButton.styleFrom(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)
-
-                        )
+                        primary: Colors.amber,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
                     ),
-                  )
+                  ),
                 ],
-
               ),
-
             ),
             const SizedBox(height: 30,),
             ElevatedButton(
               child: const Text(
                 "Sign Up",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
               ),
               style: ElevatedButton.styleFrom(
                 primary: Colors.cyan,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10)
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
               ),
               onPressed: ()
               {
                 formValidation();
               },
             ),
-            const SizedBox(height: 30,)
+            const SizedBox(height: 30,),
           ],
         ),
       ),

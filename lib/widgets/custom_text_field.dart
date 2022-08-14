@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class CustomTextField extends StatelessWidget
 {
   final TextEditingController? controller;
@@ -13,7 +14,7 @@ class CustomTextField extends StatelessWidget
     this.data,
     this.hintText,
     this.isObsecre,
-    this.enabled
+    this.enabled,
   });
 
   @override
@@ -22,7 +23,7 @@ class CustomTextField extends StatelessWidget
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10))
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.all(10),

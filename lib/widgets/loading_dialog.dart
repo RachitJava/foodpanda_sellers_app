@@ -4,6 +4,7 @@ import 'package:foodpanda_sellers_app/widgets/progress_bar.dart';
 class LoadingDialog extends StatelessWidget
 {
   final String? message;
+
   LoadingDialog({this.message});
 
   @override
@@ -15,7 +16,7 @@ class LoadingDialog extends StatelessWidget
         children: [
           circularProgress(),
           SizedBox(height: 10,),
-          Text(message! + " ,Please wait..."),
+          Text(message! + ", Please wait..."),
         ],
       ),
     );
