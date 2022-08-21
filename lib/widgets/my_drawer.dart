@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:foodpanda_sellers_app/authentication/auth_screen.dart';
 import 'package:foodpanda_sellers_app/global/global.dart';
+import 'package:foodpanda_sellers_app/mainScreens/earnings_screen.dart';
 import 'package:foodpanda_sellers_app/mainScreens/home_screen.dart';
+import 'package:foodpanda_sellers_app/mainScreens/new_orders_screen.dart';
+
+import '../mainScreens/history_screen.dart';
 
 
 
@@ -80,7 +84,7 @@ class MyDrawer extends StatelessWidget
                   ),
                   onTap: ()
                   {
-
+                    Navigator.push(context, MaterialPageRoute(builder: (c)=> EarningsScreen()));
                   },
                 ),
                 const Divider(
@@ -96,7 +100,7 @@ class MyDrawer extends StatelessWidget
                   ),
                   onTap: ()
                   {
-
+                    Navigator.push(context, MaterialPageRoute(builder: (c)=> NewOrdersScreen()));
                   },
                 ),
                 const Divider(
@@ -112,7 +116,7 @@ class MyDrawer extends StatelessWidget
                   ),
                   onTap: ()
                   {
-
+                    Navigator.push(context, MaterialPageRoute(builder: (c)=> HistoryScreen()));
                   },
                 ),
                 const Divider(
